@@ -15,7 +15,7 @@ class CreateArsipsTable extends Migration
     {
         Schema::create('arsips', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('nomor_surat');
+            $table->string('nomor_surat', 50);
             $table->enum('kategori', ['Undangan', 'Pengumuman', 'Nota Dinas', 'Pemberitahuan']);
             $table->string('judul', 100);
             $table->string('nama_file', 50);
