@@ -14,7 +14,10 @@ class ArsipController extends Controller
      */
     public function index()
     {
-        //
+        return view(
+            'arsip.index',
+            ['arsips' => Arsip::paginate(10)]
+        );
     }
 
     /**
@@ -24,7 +27,7 @@ class ArsipController extends Controller
      */
     public function create()
     {
-        //
+        return view('arsip.create');
     }
 
     /**
@@ -35,7 +38,24 @@ class ArsipController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nomor_surat' => 'required|numeric',
+            'kategori' => 'required',
+            'judul' => 'required',
+            'file_arsip' => 'required|mimes:pdf'
+        ]);
+
+        $file_arsip = $request->file('file_arsip');
+        $file_arsip->move('public/arsip', $file_arsip->getClientOriginalName());
+
+        $arsip = new Arsip();
+        $arsip->nomor_surat = $request->nomor_surat;
+        $arsip->kategori = $request->kategori;
+        $arsip->judul = $request->judul;
+        $arsip->nama_file = $file_arsip->getClientOriginalName();
+        $arsip->save();
+
+        return redirect()->back();
     }
 
     /**
@@ -46,7 +66,7 @@ class ArsipController extends Controller
      */
     public function show(Arsip $arsip)
     {
-        //
+        return view('arsip.show', ['arsip' => $arsip]);
     }
 
     /**
@@ -57,7 +77,7 @@ class ArsipController extends Controller
      */
     public function edit(Arsip $arsip)
     {
-        //
+        return view('view.edit', ['arsip' => $arsip]);
     }
 
     /**
@@ -69,7 +89,26 @@ class ArsipController extends Controller
      */
     public function update(Request $request, Arsip $arsip)
     {
-        //
+        $request->validate([
+            'nomor_surat' => 'required',
+            'kategori' => 'required',
+            'judul' => 'required',
+        ]);
+
+        $arsip->nomor_surat = $request->nomor_surat;
+        $arsip->kategori = $request->kategori;
+        $arsip->judul = $request->judul;
+
+        if (!empty($request->file('file_arsip'))) {
+            $request->validate(['file_arsip' => 'required|mimes:pdf']);
+            $file_arsip = $request->file('file_arsip');
+            $file_arsip->move('public/arsip', $file_arsip->getClientOriginalName());
+
+            $arsip->nama_file = $file_arsip->getClientOriginalName();
+        }
+        $arsip->save();
+
+        return redirect()->back();
     }
 
     /**
@@ -80,6 +119,8 @@ class ArsipController extends Controller
      */
     public function destroy(Arsip $arsip)
     {
-        //
+        $arsip->delete();
+
+        return redirect()->back();
     }
 }
